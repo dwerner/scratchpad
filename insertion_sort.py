@@ -10,10 +10,10 @@ s = sys.argv[1]
 
 n = [int(10000*random.random()) for i in xrange(int(s))]
 
-print "beginning sort..."
+sortname = "insertion"
+print "beginning "+ sortname +" sort on "+ s +" items..."
 
 start = datetime.datetime.now() 
-sortname = "insertion"
 
 for j in range(1, len(n)):
   key = n[j]
