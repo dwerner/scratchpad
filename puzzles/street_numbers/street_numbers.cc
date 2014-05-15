@@ -23,43 +23,36 @@ To start your list the first two pairs are: (house number, last number):
 #include <iostream>
 #include <math.h>
 
-double sumSeries(double first, double last){
-  double n = (last-first)+1;
-  return (n/2) * ((2*first) + ((n-1)*1) );
+#define LOOP for (;;)
+
+long sumSeries(long first, long last){
+  long n = (last-first)+1;
+  return (n * ((2*first) + ((n-1)*1)))/2 ;
 }
 
-double left_walk(double start) {
-  return 2*sumSeries(1, start);
-}
 
-double right_walk(double start, double end) {
-  return 2*sumSeries(start, end);
-}
-
-// brute force approach: 
 int main() {
    
-  // mean = avg of first and last term
-  // (remembering to exclude the term representing the woman's own home
-  
   int numbers = 0;
-  double end = 8;
-  double home = 1;
+  long home = 1;
+  long end = 2;
+  long lowSum = 1;
+  long highSum = 2;
 
-  while (numbers < 9){
+  for(numbers=0; numbers < 10; numbers++){
+    
+    LOOP {
 
-    for (home = 1; home < end; home += 1.0) {
-        
-      if (left_walk(home-1) == right_walk(home+1, end)){
+      if(lowSum < highSum) home ++;
+      end++;
+      
+      lowSum = sumSeries(1, home-1);
+      highSum = sumSeries(home+1, end);
 
-        std::cout << home << "   " << end << "\n";
-        numbers++;
-        break;
-      }
+      if(lowSum == highSum) break; 
+
     }
-
-    end += 1;
+    std::cout << home << "    " << end << "\n";
   }  
-  
 }
 
