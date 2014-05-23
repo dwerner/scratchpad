@@ -52,7 +52,7 @@ int main() {
       if(lowSum == highSum) break; 
 
     }
-    std::cout << home << "    " << end << "\n";
+    std::cout << numbers << " - " << home << "    " << end << "\n";
   }  
 }
 
