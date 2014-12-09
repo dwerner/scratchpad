@@ -9,29 +9,36 @@ typedef struct {
 } Message;
 
 Message * message_create() {
-  return (Message*) malloc( sizeof(Message ) );
+  Message *message = (Message*) malloc( sizeof(Message ) );
+  return message;
 }
 
 void message_destroy( Message * message ) {
-  free( message );
+  if ( message != NULL ) {
+    free( message );
+  }
 }
 
 typedef struct LinkedNode {
   struct LinkedNode *link;
-  struct Message *message;
+  Message *message;
 } LinkedNode;
 
-LinkedNode * node_create() {
+LinkedNode * node_create(Message *message) {
   LinkedNode *node = (LinkedNode*) malloc( sizeof(LinkedNode) );
+  node->message = message;
   return node;
 }
 
 void node_destroy( LinkedNode* node ) {
-  free( node );
+  if ( node != NULL ) {
+    message_destroy( node->message );
+    free( node );
+  }
 }
 
 typedef struct {
-  struct LinkedNode *head;
+  LinkedNode *head;
   long length;
 } LinkedQueue;
 
@@ -40,9 +47,24 @@ LinkedQueue * queue_create() {
   return queue;
 }
 
+void queue_destroy_nodes( LinkedNode *head ) {
+  if ( head != NULL ) {
+    LinkedNode *parent = head;
+    while ( parent->link != NULL ) {
+      LinkedNode *link = parent->link;
+      node_destroy( parent );
+      parent = link;
+    }
+  }
+}
+
 void queue_destroy( LinkedQueue *queue ) {
+  if ( queue != NULL ) {
+    queue_destroy_nodes( queue->head );
+  }
   free(queue);
 }
+
 
 void queue_enqueue( LinkedQueue *queue, LinkedNode *item ) {
   if (queue->head != NULL) {
@@ -64,12 +86,47 @@ typedef struct {
 } Mailbox;
 
 Mailbox * mailbox_create() {
-  return (Mailbox*) malloc( sizeof(Mailbox) );
+  Mailbox *mailbox = (Mailbox*) malloc( sizeof(Mailbox) );
+  mailbox->queue = queue_create();
+  return mailbox;
+}
+
+void mailbox_put( Mailbox *mailbox, Message *message ) {
+  pthread_mutex_lock( &mailbox->lock );
+  LinkedNode *node = node_create( message );
+  queue_enqueue( mailbox->queue, node );
+  pthread_mutex_unlock( &mailbox->lock );
+}
+
+Message * mailbox_get( Mailbox *mailbox ) {
+  pthread_mutex_lock( &mailbox->lock );
+  LinkedNode *node = queue_dequeue( mailbox->queue );
+  pthread_mutex_unlock( &mailbox->lock );
+  return node->message;
 }
 
 void mailbox_destroy(Mailbox *mailbox) {
-  free( mailbox );
+  if ( mailbox != NULL ) {
+    queue_destroy( mailbox->queue );
+    pthread_mutex_destroy( &mailbox->lock );
+    free( mailbox );
+  }
 }
+
+void lock( pthread_mutex_t *mutex ){
+  if ( pthread_mutex_trylock(mutex) ) {
+
+  }
+}
+
+typedef struct {
+  void *data;
+} Future;
+
+typedef struct {
+  Mailbox *mailbox;
+  Future(*send)(Message*);
+} Actor;
 
 
 void func( void(*fun)() ) {
