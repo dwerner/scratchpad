@@ -1,0 +1,3 @@
+#!/bin/sh
+rm play
+cc play.c -o play && ./play $1

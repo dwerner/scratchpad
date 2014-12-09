@@ -8,7 +8,6 @@ long sumSeries(long first, long last){
   return (n * ((2*first) + ((n-1)*1)))/2 ;
 }
 
-
 int main() {
    
   int numbers = 0;
@@ -18,17 +17,12 @@ int main() {
   long highSum = 2;
 
   for(numbers=0; numbers < 10; numbers++){
-    
     LOOP {
-
       if(lowSum < highSum) home ++;
       end++;
-      
       lowSum = sumSeries(1, home-1);
       highSum = sumSeries(home+1, end);
-
       if(lowSum == highSum) break; 
-
     }
     std::cout << numbers << " - " << home << "    " << end << "\n";
   }  
