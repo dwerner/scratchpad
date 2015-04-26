@@ -1,0 +1,5 @@
+[package]
+
+name = "rmelon"
+version = "0.0.1"
+authors = ["Daniel Werner <dan.werner@hubblehome.com>"]
